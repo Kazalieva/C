@@ -1,0 +1,733 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Products
+{
+    char* name;
+    int id;
+    char* exp;
+    double price;
+}Products;
+
+int size = 1;
+void initial(Products *product,int size)
+{
+    for(int i = 0; i < size; i++)
+    {
+        product[i].name = (char*)malloc(sizeof(char)*31);
+        product[i].id = 0;
+        product[i].exp = (char*)malloc(sizeof(char)*11);
+        product[i].price = 0;
+    }
+}
+
+void AddNewItem(Products *ip)
+{
+for(int i = 0; i < size; i++ )
+{
+    printf("enter a name: \n");
+    scanf("%s",ip[i].name);
+    fflush(stdin);
+
+    printf("enter an id: \n");
+    scanf("%d",&ip[i].id);
+    fflush(stdin);
+
+    printf("enter a exp: \n");
+    scanf("%s",ip[i].exp);
+    fflush(stdin);
+
+    printf("enter a price: \n");
+    scanf("%lf",&ip[i].price);
+    fflush(stdin);
+}
+size++;
+ip = (Products*)realloc(ip,sizeof(Products)*size);
+if(ip == NULL) { printf("Memory allocation error!"); exit(1);}
+}
+
+
+void create_binary(Products *ip)
+{
+    FILE *fp;
+    fp = fopen("in.bin","wb");
+    if(fp == NULL) {exit(1);}
+
+    for(int i = 0; i < size; i++)
+    {
+        fprintf(fp,"%s;%d;%s;%lf", ip[i].name,&ip[i].id,ip[i].exp,&ip[i].price);
+    }
+    fclose(fp);
+}
+
+
+Products* ReturnArray(Products *ip, char data)
+{
+    Products *new_array = NULL;
+    int is_first = 0;
+    int array_len = 0;
+    
+    for(int i = 0; i < size; i++)
+    {
+        if(strcmp(ip[i].exp,data) == 0)
+        {
+            array_len++;
+            int index = array_len - 1;
+            if(is_first)
+            {
+                new_array = (Products*)malloc(sizeof(new_array)*array_len);
+                is_first = 1;
+            }
+
+        ip[index].name = (char*)malloc(31*sizeof(char));    
+        ip[index].exp = (char*)malloc(11*sizeof(char));
+        
+        strcpy(new_array[index].name,ip[i].name);
+        new_array[index].id = ip[i].id;
+        strcpy(new_array[index].exp,ip[i].exp);
+        new_array[index].price = ip[i].price;
+
+        new_array = (Products*)realloc(new_array,sizeof(new_array)*array_len);
+        if(new_array == NULL) { exit(1);}
+        }
+    }
+    return new_array;
+}
+
+void print_products(Products *ip,int size)
+{
+    for(int i = 0; i<size; i++)
+    {
+        printf("%s;%d;%s;%lf",ip[i].name,&ip[i].id,ip[i].exp,&ip[i].price);
+    }
+}
+
+void free_products(Products *ip,int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        free(ip[i].name);
+        free(ip[i].exp);
+    }
+    free(ip);
+}
+
+void create_text_file(Products *ip)
+{
+    FILE *fp;
+    fp = fopen("outTxt.txt", "w");
+    if(fp == NULL) {exit(1);}
+
+    for(int i = 0; i < size; i++)
+    {
+        fprintf(fp,"%s;%d;%s;%lf", ip[i].name,&ip[i].id,ip[i].exp,&ip[i].price);
+    }
+    fclose(fp);
+}
+
+void binary_text()
+{
+    FILE *file_pointer;
+    Products product;
+
+    file_pointer = fopen("in.bin","rb");
+    if(file_pointer == NULL) {exit(1);}
+    while(fread(&product,sizeof(product),1,file_pointer))
+    {
+        create_text_file(&product);
+    }
+}
+
+void print_from_binary()
+{
+    FILE *file_pointer;
+    Products product;
+
+    if(file_pointer = fopen("in.bin","r")==NULL)
+    {
+        exit(1);
+    }
+    else
+    {
+        while(fread(&product,sizeof(product),1,file_pointer))
+        {
+            printf("Name = %s\n ID = %d\n Expiration Date = %s\n Price= %f\n",  product.name,
+                                                                                product.id,
+                                                                                product.exp,
+                                                                                product.price);}
+    }
+    fclose(file_pointer);
+}
+
+
+void print_from_text()
+{
+    FILE *file_pointer;
+    char buff[256];
+
+    if(file_pointer = fopen("outTxt.txt","r") == NULL)
+    {
+        exit(1);
+    }
+    else
+    {
+        while(fgets(buff,256,file_pointer))
+        {
+            buff[strcspn(buff,"\n")] = 0;
+            printf("%s",buff);
+        }
+    }
+    fclose(file_pointer);
+}
+
+int main(){
+Products *ip = (Products*)malloc(sizeof(Products)*2);
+
+initial(ip,1);
+
+strcpy(ip[0].name,"John");
+ip[0].id = 102;
+strcpy(ip[0].exp,"2022.06.12");
+ip[0].price = 12.02;
+
+AddNewItem(ip);
+
+Products *new_array = ReturnArray(ip,"2022.02.11");
+print_from_binary();
+print_from_text();
+print_products(ip,2);
+free(ip);
+
+return 0;
+}
+
+-----------------------------------------------------------------------------------------
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Artist
+{
+    char* name;
+    int age;
+    char* country;
+    double earnings;
+    int oskars;
+}Artist;
+
+int size = 1;
+void initial (Artist *artist,int size)
+{
+    for(int i = 0; i < size; i++ )
+    {
+        artist[i].name = (char*)malloc(sizeof(char)*10);
+        artist[i].age = 0;
+        artist[i].country = (char*)malloc(sizeof(char)*5);
+        artist[i].earnings = 0;
+        artist[i].oskars = 0;
+    }
+}
+
+
+void AddNewArtist(Artist*ap)
+{
+ for(int i = 0; i < size; i++)
+ {
+     printf("Enter a name:\n");
+     scanf("%s",ap[i].name);
+     fflush(stdin);
+
+     printf("Enter an age: \n");
+     scanf("%d",&ap[i].age);
+     fflush(stdin);
+
+     printf("Enter a country: \n");
+     scanf("%s",ap[i].country);
+     fflush(stdin);
+
+     printf("enter an earnings: \n");
+     scanf("%lf",&ap[i].earnings);
+     fflush(stdin);
+
+     printf("Enter an oskars: \n");
+     scanf("%d",&ap[i].oskars);
+     fflush(stdin);
+ }
+ size++;
+ ap = (Artist*)realloc(ap,sizeof(Artist)*size);
+
+ if(ap == NULL) {printf("Memory allocation error"); exit(1); }
+}
+
+Artist *ReturnCertainIncomeArtistArray(Artist*ap, long int income)
+{
+    Artist *new_artists = NULL;
+    int is_first = 0;
+    int array_size = 0;
+
+    for(int i =0; i < size; i++ )
+    {
+        if(ap[i].earnings > income)
+        {
+            array_size++;
+            int index = array_size - 1;
+            if(is_first)
+            {
+                new_artists = (Artist*)malloc(sizeof(Artist)*(array_size));
+                is_first = 1;
+            }
+        new_artists[index].name = (char*)malloc(10*sizeof(char));
+        new_artists[index].country = (char*)malloc(5*sizeof(char));
+
+        strcpy(new_artists[index].name,ap[i].name);
+        ap[i].age = new_artists[index].age;
+        strcpy(new_artists[index].country,ap[i].country);   
+        ap[i].earnings = new_artists[index].earnings;
+        ap[i].oskars = new_artists[index].oskars;
+
+        new_artists = (Artist*)realloc(new_artists,sizeof(new_artists)*array_size);
+        }
+        if(new_artists == NULL) {exit(1);}
+    }    
+}
+
+void create_file(Artist *ap)
+{
+    FILE *fp;
+    fp = fopen("fil.txt", "w");
+    if(fp == NULL) {exit(1);}
+
+    for(int i = 0; i < size - 1; i++)
+    {
+        fprintf(fp,"%s;%d;%s;%lf%d",ap[i].name,ap[i].age,ap[i].country,ap[i].earnings,ap[i].oskars);
+    }
+    fclose(fp);
+}
+
+
+int count_lines(FILE *fp)
+{
+    char buff[256];
+    int counter = 0;
+    while(fgets(buff,256,fp) != NULL)
+    {
+        counter++;
+    }
+    return counter;
+}
+
+
+void read_file(FILE *fp,Artist *artist,int counter)
+{
+    char buff[256];
+    char *string;
+    counter--;
+
+while(fgets(buff,256,fp) != NULL)
+{
+    string = strtok(buff,";");
+    strcpy(artist[counter].name,string);
+
+    string = strtok(NULL,";");
+    artist[counter].age = atoi(string);
+
+    string = strtok(buff, ";");
+    strcpy(artist[counter].country,string);
+
+    string = strtok(NULL,";");
+    artist[counter].earnings = atoi(string);
+
+    string = strtok(NULL, ";");
+    artist[counter].oskars = atoi(string);
+    counter--;
+}
+}
+
+void print(Artist *artist)
+{
+    for(int i = 0; i < size; i++)
+    {
+        printf("%s;%d;%s;%lf;%d",artist[i].name,artist[i].age,artist[i].country,artist[i].earnings,artist[i].oskars);
+    }
+}
+
+int main(){
+
+Artist *artist = (Artist*)malloc(sizeof(Artist)*5);
+
+initial(artist,1);
+
+strcpy(artist[0].name,"John");
+artist[0].age = 58;
+strcpy(artist[0].country,"USA");
+artist[0].earnings = 1000;
+artist[0].oskars = 0;
+
+AddNewArtist(artist);
+
+Artist *new_artist = ReturnCertainIncomeArtistArray(artist,100);
+
+FILE *artist_file;
+
+if(artist_file =fopen("artist.txt","r") == NULL)
+{ exit(1);}
+
+int count = count_lines(artist);
+
+    return 0;
+}
+
+-------------------------------------------------------------------------------------------
+
+Online casino game:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int cash = 100;
+
+void Play(int bet)
+{
+    char *arrayWithCards = (char*)malloc (3*sizeof(char));         //--> heap not in the stack
+    arrayWithCards[0] = 'J'; 
+    arrayWithCards[1] = 'K'; 
+    arrayWithCards[2] = 'Q'; 
+
+    srand(time(NULL));                  //random generator
+    for(int i = 0; i < 5; i++)
+    {
+        int x = rand() % 3;
+        int y = rand() % 3;
+        int temp = arrayWithCards[x];
+        arrayWithCards[x] = arrayWithCards[y];
+        arrayWithCards[y] = temp;
+    }
+    int playerGuessess;
+    printf("What is the position of queen -> 1, 2, 3?\n");
+    scanf("%d",&playerGuessess);
+    if(arrayWithCards[playerGuessess - 1] == 'Q')
+    {
+        cash += 3*bet;
+        printf("You win! The cash is: %d   Result: /%c %c %c/", cash,arrayWithCards[0],arrayWithCards[1],arrayWithCards[2]);
+    }
+    else{
+        cash -= bet;
+        printf("Oops! The cash is: %d   Result:/ %c %c %c/", cash,arrayWithCards[0],arrayWithCards[1],arrayWithCards[2]);
+    }
+    free(arrayWithCards);    
+}
+int main(){
+    printf("WELCOME TO THE VIRTUAL CASINO!\n");
+    printf("Total cash is: $%d",cash);
+    int bet;
+    while(cash > 0){
+        printf("\nwhat's your bet? $");
+        scanf("%d",&bet);
+        if(bet == 0 || bet> cash) {break;}
+        Play(bet);
+    }
+
+    return 0;
+}
+
+----------------------------------------------------------------------------------------------
+
+int bonus(int);
+int bonus(int n)
+{
+    double sumBonus,allResult;
+    if(n <=100)
+    {
+        sumBonus +=5;
+    }
+    else if(n > 100 && n<1000)
+    {
+        sumBonus = n * 0.20;
+    }
+    else if(n>1000)
+    {
+        sumBonus = n * 0.10;
+    }
+
+    if(n % 2 == 0)
+    {
+        sumBonus+=1;
+    }
+
+    if(n % 10 ==5)
+    {
+        sumBonus +=2;
+    }
+printf("%.2lf\n",sumBonus);
+allResult = n + sumBonus;
+printf("%.2lf",allResult);
+
+}
+int main(){
+    int n;
+    printf("Enter a number:");
+    scanf("%d",&n);
+
+    double result = bonus(n);
+
+    return 0;
+} 
+
+--------------------------------------------------------------------------------------------------
+
+typedef struct Cars
+{
+    char* marka;
+    char* model;
+    int engine;
+    double price;
+    char* registration;
+}Cars;
+
+ void initial(Cars *cars,int size)
+{
+    for(int i =0; i < size; i++)
+    {
+        cars[i].marka = (char*)malloc(sizeof(char)*6);
+        cars[i].model = (char*)malloc(sizeof(char)*6);
+        cars[i].engine = 0;
+        cars[i].price = 0;
+        cars[i].registration = (char*)malloc(sizeof(char)*2);
+    }
+} 
+
+void AddNEw(Cars *cars, int size)
+{
+    for(int i = 0; i < size; i++)
+    {
+        printf("Enter a name: \n");
+        scanf("%s",cars[i].marka);
+        fflush(stdin);
+
+         printf("Enter a model: \n");
+        scanf("%s",cars[i].model);
+        fflush(stdin);
+
+         printf("Enter an engine: \n");
+        scanf("%d",&cars[i].engine);
+        fflush(stdin);
+
+         printf("Enter a price: \n");
+        scanf("%lf",&cars[i].price);
+        fflush(stdin);
+
+         printf("Enter a name: \n");
+        scanf("%s",cars[i].registration);
+        fflush(stdin);
+
+        cars = (Cars*)realloc(cars,sizeof(Cars)*size);
+    }
+}
+
+void file_write(Cars *cars,int size)
+{
+    FILE *fp;
+    fp = fopen("cars.txt","w");
+    if(fp == NULL) {exit(1);}
+
+    for(int i =0; i < size; i++)
+    {
+        fprintf(fp,"%s\n%s\n%d\n%lf\n%s",cars[i].marka,cars[i].model,&cars[i].engine,&cars[i].price,cars[i].registration);
+    }
+    fclose(fp);
+}
+
+int main(){
+    Cars *cars = (Cars*)malloc(sizeof(Cars)*4);
+    initial(cars,1);
+    
+    strcpy(cars[0].marka, "Audi");
+    strcpy(cars[0].model,"A7");
+    cars[0].engine = 120;
+    cars[0].price = 25000;
+    strcpy(cars[0].registration,"Y");
+
+    FILE *fp;
+    fp = fopen("cars.txt","w");
+    if(fp == NULL) {exit(1);}
+    AddNEw(cars,1);
+    file_write(fp,2);
+} 
+---------------------------------------------------------------------------------------------------
+
+#include <stdio.h>
+#include <ctype.h>
+#include <math.h>
+
+int main(){
+
+    char operator;
+    double num1;
+    double num2;
+    double result;
+
+    printf("\nEnter an operator(+ - * /):");
+    scanf("%c",&operator);
+
+    printf("Enter number 1: ");
+    scanf("%lf",&num1);
+
+    printf("Enter number 2: ");
+    scanf("%lf",&num2);
+
+    switch (operator)
+    {
+    case '+':
+        result = num1 + num2;
+        printf("\nresult: %.2lf", result);
+        break;
+    
+     case '-':
+        result = num1 - num2;
+        printf("\nresult: %.2lf", result);
+        break;
+
+     case '*':
+        result = num1 * num2;
+        printf("\nresult: %.2lf", result);
+        break;
+
+     case '/':
+        result = num1 / num2;
+        printf("\nresult: %.2lf", result);
+        break;
+    
+    default:
+    printf("Not valid operator!");
+    }
+
+    return 0;
+} 
+--------------------------------------------------------------------------------------------------------
+int main(){
+char operator;
+int num1,num2,result;
+
+printf("\nEnter two numbers: ");
+scanf("%d %d", &num1, &num2);
+
+printf("\nEnter an operator: ");
+scanf("%c", &operator);
+
+if(operator == '+')
+{
+   result = num1 + num2;
+}
+else if(operator == '-'){
+   if(num1>num2)
+   {
+      result = num1 - num2;
+   }
+   else
+   {
+      result = num2 - num1;
+   }
+}
+else if(operator == '*')
+{
+   result = num1 * num2;
+}
+else if(operator == '/')
+{
+   if(num2 != 0){
+      result = num1 / num2;
+   }else{
+      printf("Enter a number different from 0!");
+   }
+ }
+ else if(operator == '%'){
+   if(num2 != 0){
+      result = num1 % num2;
+   }else{
+      printf("Enter a number different from 0!");
+   }  
+}
+
+return 0;
+}
+--------------------------------------------------------------------------------------------------------
+
+#include <stdio.h>
+#include<ctype.h>
+
+#include <stdlib.h> 
+#define STEP 20
+
+int main()
+{
+  const int LOWER = 0;
+  const int UPPER = 300;
+  double fahr;
+  int cel;
+
+  for(cel=LOWER; cel<=UPPER;cel+=STEP){
+    fahr = cel*9.0/5 + 32;
+    printf("\nCel: %d",cel);
+    printf("\t\nFah: %.2lf",fahr);
+  }
+
+
+   return 0;
+}
+
+int main(){
+  int lower,upper,step;
+  float fahr;
+  int cel;
+
+  printf("Input lower:");
+  scanf("%d",&lower);
+
+  printf("Input upper:");
+  scanf("%d",&upper);
+
+  printf("The step:");
+  scanf("%d",&step);
+
+printf("Celsius to Fahrenheit convertor\n");
+printf("C\tF\n");
+
+  for(cel=lower;cel<=upper;cel+=step){
+    fahr= cel* 9.0 /5 + 32;
+    printf("%d\t%.2f\n",cel,fahr);
+  }
+
+return 0;
+} 
+------------------------------------------------------------------------------------------------------------
+
+int main(){
+  char unit;
+  double temp;
+
+  printf("Choose one option: (F)/(C) -->  ");
+  scanf("%c",&unit);
+
+  unit = toupper(unit);
+   if (unit =='F'){
+     printf("Enter the temp in C :");
+     scanf("%lf",&temp);
+     temp = (temp * 9/5) + 32;
+     printf("The result in F is : %.2lf ",temp);
+   }
+  else if(unit=='C'){
+    printf("Enter temp in F :");
+    scanf("%lf",&temp);
+    temp = (temp -32) * 5 / 9;
+     printf("The result in C is : %.2lf ",temp);
+  }
+  else{
+    printf("Choose only between (F) / (C)");
+  }
+   return 0;
+}
+------------------------------------------------------------------------------------------------------------
+
